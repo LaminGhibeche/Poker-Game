@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق بوكر تكساس المصغر</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            direction: rtl;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            background: #252525;
+            height: 100vh;
+            max-height: 850px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .header-bar {
+            background: #111;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+        }
+        .wallet-info {
+            background: #222;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #00ffcc;
+            font-size: 14px;
+            color: #00ffcc;
+            font-weight: bold;
+        }
+        .game-area {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+        }
+        .poker-table {
+            width: 95%;
+            height: 240px;
+            background: radial-gradient(circle, #1b7332 60%, #114b20 100%);
+            border: 12px solid #5a3d28;
+            border-radius: 120px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .community-cards {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .card {
+            width: 45px;
+            height: 68px;
+            background: #fff;
+            color: #000;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .card.red { color: #e53935; }
+        .card.hidden-card {
+            background: linear-gradient(135deg, #cc0000 25%, #990000 100%);
+            border: 2px solid #fff;
+            color: transparent;
+        }
+        .seat {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid #555;
+        }
+        .seat-top-left  { top: -25px; left: 15%; }
+        .seat-top-right { top: -25px; right: 15%; }
+        .seat-left      { top: 40%; left: -30px; }
+        .seat-right     { top: 40%; right: -30px; }
+        .mini-hand {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+        }
+        .mini-hand .card { width: 18px; height: 26px; font-size: 8px; border-radius: 2px; }
+        .player-main-area {
+            background: #1e1e1e;
+            padding: 15px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-top: 3px solid #333;
+        }
+        .player-info {
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        .my-cards {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .my-cards .card {
+            width: 60px;
+            height: 90px;
+            font-size: 22px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 8px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .btn-fold { background: #d32f2f; }
+        .btn-fold:hover { background: #b71c1c; }
+        .btn-call { background: #1976d2; }
+        .btn-call:hover { background: #115293; }
+        .btn-raise { background: #388e3c; }
+        .btn-raise:hover { background: #235827; }
+        .btn-deal { background: #ff9800; color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header-bar">
+        <div>♠️ بوكر تكساس هولديم</div>
+        <div class="wallet-info" id="wallet-balance">رصيدك: 50.00 USDT</div>
+    </div>
+
+    <div class="game-area">
+        <div class="poker-table">
+            <div class="seat seat-top-left">
+                <span>اللاعب 2 (أحمد)</span>
+                <div class="mini-hand"><div class="card hidden-card"></div><div class="card hidden-card"></div></div>
+            </div>
+            <div class="seat seat-top-right">
+                <span>اللاعب 3 (سارة)</span>
+                <div class="mini-hand"><div class="card hidden-card"></div><div class="card hidden-card"></div></div>
+            </div>
+            <div class="seat seat-left">
+                <span>اللاعب 4</span>
+                <div class="mini-hand"><div class="card hidden-card"></div><div class="card hidden-card"></div></div>
+            </div>
+            <div class="seat seat-right">
+                <span>اللاعب 5</span>
+                <div class="mini-hand"><div class="card hidden-card"></div><div class="card hidden-card"></div></div>
+            </div>
+            <div class="community-cards" id="community-area"></div>
+        </div>
+    </div>
+
+    <div class="player-main-area">
+        <div class="player-info">أوراقك الحالية:</div>
+        <div class="my-cards" id="my-cards-area"></div>
+        <div class="action-buttons">
+            <button class="btn btn-fold" onclick="alert('لقد انسحبت من الجولة!')">انسحاب Fold</button>
+            <button class="btn btn-call" onclick="alert('تمت مجاراة الرهان Call')">مجاراة Call</button>
+            <button class="btn btn-raise" onclick="alert('تمت زيادة الرهان Raise')">زيادة Raise</button>
+            <button class="btn btn-deal" onclick="startNewHand()">توزيع جديد 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const suits = ['♠', '♥', '♦', '♣'];
+    const suitsRed = ['♥', '♦'];
+    const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+    window.onload = function() {
+        startNewHand();
+    };
+
+    function startNewHand() {
+        let deck = [];
+        for (let suit of suits) {
+            for (let value of values) {
+                deck.push({ value: value, suit: suit });
+            }
+        }
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+
+        const card1 = deck.pop();
+        const card2 = deck.pop();
+        
+        const myCardsArea = document.getElementById('my-cards-area');
+        myCardsArea.innerHTML = `
+            <div class="card ${suitsRed.includes(card1.suit) ? 'red' : ''}"><div>${card1.value}</div><div>${card1.suit}</div></div>
+            <div class="card ${suitsRed.includes(card2.suit) ? 'red' : ''}"><div>${card2.value}</div><div>${card2.suit}</div></div>
+        `;
+
+        const com1 = deck.pop();
+        const com2 = deck.pop();
+        const com3 = deck.pop();
+
+        const communityArea = document.getElementById('community-area');
+        communityArea.innerHTML = `
+            <div class="card ${suitsRed.includes(com1.suit) ? 'red' : ''}"><div>${com1.value}</div><div>${com1.suit}</div></div>
+            <div class="card ${suitsRed.includes(com2.suit) ? 'red' : ''}"><div>${com2.value}</div><div>${com2.suit}</div></div>
+            <div class="card ${suitsRed.includes(com3.suit) ? 'red' : ''}"><div>${com3.value}</div><div>${com3.suit}</div></div>
+        `;
+    }
+</script>
+
+</body>
+</html>
